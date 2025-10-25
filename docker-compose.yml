@@ -1,0 +1,72 @@
+version: '3'
+
+services:
+  db_user:
+    image: postgres
+    container_name: db_user
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: sd-user
+    ports:
+      - "5433:5432"
+    volumes:
+      - db-user:/var/lib/postgresql/data
+    networks:
+      tema1_net:
+
+  userservice:
+    build:
+      context: ./UserService
+      dockerfile: ./Dockerfile
+    container_name: userservice
+    ports:
+      - "8090:8080"
+    environment:
+      - DB_IP=db_user
+      - DB_PORT=5432
+      - DB_DBNAME=sd-user
+      - DB_USER=postgres
+      - DB_PASSWORD=root
+    networks:
+      tema1_net:
+
+  db_device:
+    image: postgres
+    container_name: db_device
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: sd-device
+    ports:
+      - "5434:5432"
+    volumes:
+      - db-device:/var/lib/postgresql/data
+    networks:
+      tema1_net:
+
+  deviceservice:
+    build:
+      context: ./DeviceService
+      dockerfile: ./Dockerfile
+    container_name: deviceservice
+    ports:
+      - "8091:8081"
+    environment:
+      - DB_IP=db_device
+      - DB_PORT=5432
+      - DB_DBNAME=sd-device
+      - DB_USER=postgres
+      - DB_PASSWORD=root
+    networks:
+      tema1_net:    
+
+volumes:
+  db-user:
+  db-device:
+
+networks:
+  tema1_net:
+    external: true

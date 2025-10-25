@@ -1,0 +1,18 @@
+FROM maven:3.9 AS build
+
+ENV TZ=UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+ENV CATALINA_OPTS="-Duser.timezone=UTC"
+
+COPY ./pom.xml /userservice/pom.xml
+WORKDIR /userservice
+RUN mvn dependency:go-offline
+COPY ./src/ /userservice/src
+WORKDIR /userservice
+RUN mvn clean install -DskipTests
+
+FROM openjdk:21-jdk
+WORKDIR /userservice
+COPY --from=build /userservice/target/*.jar /userservice/userservice.jar
+EXPOSE 8080
+CMD ["java", "-jar", "userservice.jar"]

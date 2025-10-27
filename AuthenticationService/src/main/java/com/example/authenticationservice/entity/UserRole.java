@@ -1,2 +1,6 @@
-package com.example.authenticationservice.entity;public enum UserRole {
+package com.example.authenticationservice.entity;
+
+public enum UserRole {
+
+    ADMIN,USER
 }

@@ -8,5 +8,5 @@ import lombok.Data;
 import com.example.authenticationservice.entity.UserRole;
 
 @Builder
-public record UserDto(Long id, String username, UserRole role) {
+public record UserDto(Long id, String username, UserRole userRole) {
 }

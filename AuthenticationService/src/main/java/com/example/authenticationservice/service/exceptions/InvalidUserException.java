@@ -1,4 +1,4 @@
-package com.example.authenticationservice.service;
+package com.example.authenticationservice.service.exceptions;
 
 public class InvalidUserException extends RuntimeException{
     public InvalidUserException(String errs){

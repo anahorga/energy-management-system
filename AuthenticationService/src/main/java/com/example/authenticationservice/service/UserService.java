@@ -67,5 +67,22 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
+    public Long adminRegister(RegisterRequest registerRequest) {
+        UserEntity user = UserEntity.builder()
+                .username(registerRequest.username())
+                .password(encoder.encode(registerRequest.password()))
+                .userRole(registerRequest.userRole())
+                .build();
+
+
+        String errs = userValidator.validate(user);
+        if (!errs.isEmpty()) {
+            throw new InvalidUserException(errs);
+        }
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new UserAlreadyExistException();
+        }
+        return userRepository.save(user).getId();
+    }
 
 }

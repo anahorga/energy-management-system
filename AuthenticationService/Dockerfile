@@ -1,0 +1,18 @@
+FROM maven:3.9 AS build
+
+ENV TZ=UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+ENV CATALINA_OPTS="-Duser.timezone=UTC"
+
+COPY ./pom.xml /authenticationservice/pom.xml
+WORKDIR /authenticationservice
+RUN mvn dependency:go-offline
+COPY ./src/ /authenticationservice/src
+WORKDIR /authenticationservice
+RUN mvn clean install -DskipTests
+
+FROM openjdk:21-jdk
+WORKDIR /authenticationservice
+COPY --from=build /authenticationservice/target/*.jar /authenticationservice/authenticationservice.jar
+EXPOSE 8082
+CMD ["java", "-jar", "authenticationservice.jar"]

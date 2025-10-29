@@ -80,4 +80,17 @@ public class UserController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+    @PostMapping("/register-admin")
+    @SneakyThrows
+    @AllowAdmin
+    public ResponseEntity<?> adminRegister(@RequestBody RegisterRequest registerRequest)
+    {
+        try {
+            return ResponseEntity.ok(userService.register(registerRequest));
+        }catch (InvalidUserException | UserAlreadyExistException e){
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
 }

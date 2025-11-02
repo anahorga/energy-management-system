@@ -14,5 +14,5 @@ RUN mvn clean install -DskipTests
 FROM openjdk:21-jdk
 WORKDIR /userservice
 COPY --from=build /userservice/target/*.jar /userservice/userservice.jar
-EXPOSE 8080
+EXPOSE 8081
 CMD ["java", "-jar", "userservice.jar"]

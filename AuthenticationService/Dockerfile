@@ -14,5 +14,5 @@ RUN mvn clean install -DskipTests
 FROM openjdk:21-jdk
 WORKDIR /authenticationservice
 COPY --from=build /authenticationservice/target/*.jar /authenticationservice/authenticationservice.jar
-EXPOSE 8082
+EXPOSE 8083
 CMD ["java", "-jar", "authenticationservice.jar"]

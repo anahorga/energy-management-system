@@ -14,5 +14,5 @@ RUN mvn clean install -DskipTests
 FROM openjdk:21-jdk
 WORKDIR /deviceservice
 COPY --from=build /deviceservice/target/*.jar /deviceservice/deviceservice.jar
-EXPOSE 8081
+EXPOSE 8082
 CMD ["java", "-jar", "deviceservice.jar"]

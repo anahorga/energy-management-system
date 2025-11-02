@@ -24,9 +24,9 @@ public class DeviceController {
 
 
     @GetMapping
-    public ResponseEntity<List<DeviceDto>> findAllMembers() {
-        List<DeviceDto> users = deviceService.findAll();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<DeviceDto>> findAllDevices() {
+        List<DeviceDto> devices = deviceService.findAll();
+        return ResponseEntity.ok(devices);
     }
     @PostMapping
     public ResponseEntity<?> save(@RequestBody DeviceDto devicedto) {

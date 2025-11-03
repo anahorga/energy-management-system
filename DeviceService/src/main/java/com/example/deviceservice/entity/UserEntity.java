@@ -20,7 +20,6 @@ public class UserEntity {
     @Id
     private Long id;
 
-
     @OneToMany(
             mappedBy = "user",
             fetch = FetchType.LAZY,

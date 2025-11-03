@@ -8,6 +8,7 @@ import com.example.deviceservice.exceptions.InvalidDeviceException;
 import com.example.deviceservice.exceptions.UserNotFoundException;
 import com.example.deviceservice.service.DeviceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,8 @@ public class DeviceController {
         List<DeviceDto> devices = deviceService.findAll();
         return ResponseEntity.ok(devices);
     }
+
+
     @PostMapping
     public ResponseEntity<?> save(@RequestBody DeviceDto devicedto) {
 
@@ -54,11 +57,14 @@ public class DeviceController {
         }
     }
     @PostMapping("/user")
-    public ResponseEntity<?> saveUser(@RequestBody UserDto user){
-
+    public ResponseEntity<?> saveUser(@RequestBody UserDto user) {
+        try {
             return ResponseEntity.ok(deviceService.saveUser(user));
-
+        } catch (DuplicateKeyException|IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id,@RequestBody  DeviceDto device) {
@@ -76,6 +82,17 @@ public class DeviceController {
             deviceService.deleteDevice(id);
             return ResponseEntity.ok().build();
         }catch(DeviceNotFoundException e){
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+    @GetMapping ("/{id}")
+    public ResponseEntity<?> getDevicesByUserId(@PathVariable Long id){
+        try {
+
+            return ResponseEntity.ok(deviceService.findByUserId(id));
+        }catch(UserNotFoundException e){
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage()));

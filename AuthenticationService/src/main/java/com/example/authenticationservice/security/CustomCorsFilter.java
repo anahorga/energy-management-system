@@ -7,11 +7,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
-/**
- * This is only for local development to allow cookies to be set "cross-domain", which just means different ports
- * of the same localhost
- * @author slimboi
- */
 @Configuration
 public class CustomCorsFilter implements Filter {
 

@@ -24,9 +24,6 @@ public class DeviceEntity {
     @Column(name = "consumption", nullable = false)
     private Double consumption;
 
-
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;

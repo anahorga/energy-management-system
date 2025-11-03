@@ -14,6 +14,7 @@ import com.example.deviceservice.repository.UserRepository;
 import com.example.deviceservice.validator.DeviceValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,12 +57,22 @@ public class DeviceService {
         }
 
 
-        public UserDto saveUser(UserDto userDto)
-        {
+        @Transactional
+        public UserDto saveUser(UserDto userDto) {
                 UserEntity userEntity = userMapper.userDtoToUserEntity(userDto);
 
-                return userMapper.userEntityToUserDto(userRepository.save(userEntity));
+                if (userEntity.getId() == null) {
+                        throw new IllegalArgumentException("User id must be provided (no auto-generation).");
+                }
+
+                if (userRepository.existsById(userEntity.getId())) {
+                        throw new DuplicateKeyException("User with id " + userEntity.getId() + " already exists");
+                }
+
+                UserEntity saved = userRepository.save(userEntity);
+                return userMapper.userEntityToUserDto(saved);
         }
+
 
         @Transactional
         public DeviceDto updateDevice(DeviceDto dto, Long id) {
@@ -95,4 +106,12 @@ public class DeviceService {
         }
 
 
+        public List<DeviceDto> findByUserId(Long id) {
+                if (!userRepository.existsById(id)) {
+                        throw new UserNotFoundException("User with id " + id + " not found");
+                }
+
+                return deviceMapper.deviceEntityToDeviceDto(deviceRepository.findAllByUser_Id(id));
+
+        }
 }

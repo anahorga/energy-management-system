@@ -1,4 +1,11 @@
 http:
+  middlewares:
+    auth-fw:
+      forwardAuth:
+        address: "http://authenticationservice:8083/validate"
+        trustForwardHeader: true
+        authRequestHeaders:
+         - "app-auth"
   # Define URL routing rules, middlewares, and services
   routers:
     user-api:
@@ -6,12 +13,16 @@ http:
       entryPoints:
         - web # Listen on the web (HTTP) entry point
       service: user-service
+      middlewares:
+        - auth-fw
       
     device-api:
         rule: "Host(`localhost`) && PathPrefix(`/api/devices`)" # Match requests to localhost with /api prefix
         entryPoints:
           - web # Listen on the web (HTTP) entry point
         service: device-service
+        middlewares:
+          - auth-fw
         
     authentication-api:
         rule: "Host(`localhost`) && PathPrefix(`/api/auth`)" # Match requests to localhost with /api prefix

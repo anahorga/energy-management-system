@@ -1,47 +1,86 @@
 http:
   middlewares:
+    # Middleware pentru CORS
+    cors-headers:
+      headers:
+        accessControlAllowOriginList:
+          - "http://localhost:5173"
+        accessControlAllowMethods:
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "DELETE"
+          - "PATCH"
+          - "OPTIONS"
+        accessControlAllowHeaders:
+          - "Content-Type"
+          - "app-auth"
+          - "Origin"
+          - "Accept"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: 100
+        addVaryHeader: true
+
+    # Middleware pentru forward auth
     auth-fw:
       forwardAuth:
         address: "http://authenticationservice:8083/validate"
         trustForwardHeader: true
         authRequestHeaders:
-         - "app-auth"
+          - "app-auth"
+
   # Define URL routing rules, middlewares, and services
   routers:
     user-api:
-      rule: "Host(`localhost`) && PathPrefix(`/api/users`)" # Match requests to localhost with /api prefix
+      rule: "Host(`localhost`) && PathPrefix(`/api/users`)"
       entryPoints:
-        - web # Listen on the web (HTTP) entry point
+        - web
       service: user-service
       middlewares:
-        - auth-fw
-      
+        - cors-headers  # CORS primul!
+        - auth-fw       # Auth al doilea
+
     device-api:
-        rule: "Host(`localhost`) && PathPrefix(`/api/devices`)" # Match requests to localhost with /api prefix
-        entryPoints:
-          - web # Listen on the web (HTTP) entry point
-        service: device-service
-        middlewares:
-          - auth-fw
+      rule: "Host(`localhost`) && PathPrefix(`/api/devices`)"
+      entryPoints:
+        - web
+      service: device-service
+      middlewares:
+        - cors-headers  # CORS primul!
+        - auth-fw       # Auth al doilea
         
     authentication-api:
-        rule: "Host(`localhost`) && PathPrefix(`/api/auth`)" # Match requests to localhost with /api prefix
-        entryPoints:
-          - web # Listen on the web (HTTP) entry point
-        service: authentication-service
+      rule: "Host(`localhost`) && PathPrefix(`/api/auth`)"
+      entryPoints:
+        - web
+      service: authentication-service
+      middlewares:
+        - cors-headers  # CORS și pentru auth service
+    frontend-app:
+      rule: "Host(`localhost`)" # <-- Prinde tot traficul rămas
+      priority: 1 # <-- Prioritate mai mică
+      entryPoints: [web]
+      service: frontend-service
+      middlewares:
+        - cors-headers
 
   services:
     user-service:
       loadBalancer:
         servers:
-          - url: "http://userservice:8081" # Container name solved by Docker DNS
+          - url: "http://userservice:8081"
 
     device-service:
       loadBalancer:
         servers:
-          - url: "http://deviceservice:8082" # Container name solved by Docker DNS
+          - url: "http://deviceservice:8082"
       
     authentication-service:
       loadBalancer:
         servers:
-          - url: "http://authenticationservice:8083" # Container name solved by Docker DNS
+          - url: "http://authenticationservice:8083"
+    frontend-service:
+      loadBalancer:
+        servers:
+          # Numele containerului 'frontend' și portul 80 (din Nginx)
+          - url: "http://frontend:80"

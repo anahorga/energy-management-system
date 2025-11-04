@@ -21,7 +21,15 @@ public class SecurityConfigDefault {
                 .authorizeHttpRequests(requests ->
                         requests
                                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                                .requestMatchers("/api/auth/register","/api/auth/login", "/api/auth/healthcheck","/validate").permitAll()
+                                .requestMatchers(
+                                        "/api/auth/register",
+                                        "/api/auth/login",
+                                        "/api/auth/healthcheck",
+                                        "/validate",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html",
+                                        "/v3/api-docs/**"
+                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter(), BasicAuthenticationFilter.class);

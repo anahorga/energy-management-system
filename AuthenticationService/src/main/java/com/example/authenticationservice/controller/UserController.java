@@ -63,10 +63,10 @@ public class UserController {
         response.addCookie(cookie);
         return ResponseEntity.ok(Map.of("token", jwt));
     }
-    @GetMapping("/admin/{id}")
+    @GetMapping
     @AllowAdmin
-    public ResponseEntity<List<UserDto>> getRegisteredUsers(@PathVariable("id") Long adminId) {
-        return ResponseEntity.ok(userService.getRegisteredUsers(adminId));
+    public ResponseEntity<List<UserDto>> getRegisteredUsers() {
+        return ResponseEntity.ok(userService.getRegisteredUsers());
     }
     @DeleteMapping("/{id}")
     @AllowAdmin
@@ -83,11 +83,11 @@ public class UserController {
     @PostMapping("/register-admin")
     @SneakyThrows
     @AllowAdmin
-    public ResponseEntity<?> adminRegister(@RequestBody RegisterRequest registerRequest)
-    {
+    public ResponseEntity<?> adminRegister(@RequestBody RegisterRequest registerRequest) {
         try {
-            return ResponseEntity.ok(userService.register(registerRequest));
-        }catch (InvalidUserException | UserAlreadyExistException e){
+            UserDto createdUser = userService.adminRegister(registerRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } catch (InvalidUserException | UserAlreadyExistException e) {
             return ResponseEntity
                     .badRequest()
                     .body(Map.of("error", e.getMessage()));

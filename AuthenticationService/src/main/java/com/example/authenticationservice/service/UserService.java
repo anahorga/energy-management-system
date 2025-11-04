@@ -51,13 +51,7 @@ public class UserService {
         }
         return null;
     }
-    public List<UserDto> getRegisteredUsers(Long adminId) {
-        UserEntity admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + adminId + " not found"));
-
-        if (admin.getUserRole() != UserRole.ADMIN) {
-            throw new UserNotAuthorizedException("User with id " + adminId + " is not an admin");
-        }
+    public List<UserDto> getRegisteredUsers() {
 
         return userMapper.userEntityToUserDto(userRepository.findAll());
     }
@@ -67,13 +61,12 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
-    public Long adminRegister(RegisterRequest registerRequest) {
+    public UserDto adminRegister(RegisterRequest registerRequest) {
         UserEntity user = UserEntity.builder()
                 .username(registerRequest.username())
                 .password(encoder.encode(registerRequest.password()))
                 .userRole(registerRequest.userRole())
                 .build();
-
 
         String errs = userValidator.validate(user);
         if (!errs.isEmpty()) {
@@ -82,7 +75,11 @@ public class UserService {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new UserAlreadyExistException();
         }
-        return userRepository.save(user).getId();
+
+        UserEntity saved = userRepository.save(user);
+
+        // Returnează UserDto complet (cu id, username, userRole)
+        return userMapper.userEntityToUserDto(saved);
     }
 
 }

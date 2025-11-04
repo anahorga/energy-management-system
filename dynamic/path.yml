@@ -39,7 +39,7 @@ http:
       middlewares:
         - cors-headers  # CORS primul!
         - auth-fw       # Auth al doilea
-      
+
     device-api:
       rule: "Host(`localhost`) && PathPrefix(`/api/devices`)"
       entryPoints:

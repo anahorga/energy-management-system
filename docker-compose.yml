@@ -93,6 +93,15 @@ services:
       - DB_PASSWORD=root
     networks:
       tema1_net:
+
+  frontend:
+    build:
+      context: ./ems-frontend  # Calea către codul frontend
+      dockerfile: ./Dockerfile   # Dockerfile-ul pe care tocmai l-am creat
+    container_name: frontend
+    networks:
+      - tema1_net
+      
   traefik:
     image: traefik:v3.0
     container_name: traefik

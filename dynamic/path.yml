@@ -56,6 +56,13 @@ http:
       service: authentication-service
       middlewares:
         - cors-headers  # CORS și pentru auth service
+    frontend-app:
+      rule: "Host(`localhost`)" # <-- Prinde tot traficul rămas
+      priority: 1 # <-- Prioritate mai mică
+      entryPoints: [web]
+      service: frontend-service
+      middlewares:
+        - cors-headers
 
   services:
     user-service:
@@ -72,3 +79,8 @@ http:
       loadBalancer:
         servers:
           - url: "http://authenticationservice:8083"
+    frontend-service:
+      loadBalancer:
+        servers:
+          # Numele containerului 'frontend' și portul 80 (din Nginx)
+          - url: "http://frontend:80"
